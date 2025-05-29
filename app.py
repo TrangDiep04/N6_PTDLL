@@ -18,38 +18,63 @@ def home():
 def predict():
     try:
         # Lấy dữ liệu từ form
-        male = int(request.form['male'])
-        age = float(request.form['age'])
-        education = float(request.form['education'])
-        currentSmoker = int(request.form['currentSmoker'])
-        cigsPerDay = float(request.form['cigsPerDay'])
-        BPMeds = int(request.form['BPMeds'])
-        prevalentStroke = int(request.form['prevalentStroke'])
-        prevalentHyp = int(request.form['prevalentHyp'])
-        diabetes = int(request.form['diabetes'])
-        totChol = float(request.form['totChol'])
-        sysBP = float(request.form['sysBP'])
-        diaBP = float(request.form['diaBP'])
-        BMI = float(request.form['BMI'])
-        heartRate = float(request.form['heartRate'])
-        glucose = float(request.form['glucose'])
+        input_data = [
+            int(request.form['male']),
+            float(request.form['age']),
+            float(request.form['education']),
+            int(request.form['currentSmoker']),
+            float(request.form['cigsPerDay']),
+            int(request.form['BPMeds']),
+            int(request.form['prevalentStroke']),
+            int(request.form['prevalentHyp']),
+            int(request.form['diabetes']),
+            float(request.form['totChol']),
+            float(request.form['sysBP']),
+            float(request.form['diaBP']),
+            float(request.form['BMI']),
+            float(request.form['heartRate']),
+            float(request.form['glucose'])
+        ]
 
-        # Tạo mảng đầu vào với tất cả các đặc trưng (thứ tự khớp với dữ liệu huấn luyện)
-        input_data = np.array([
-            [male, age, education, currentSmoker, cigsPerDay, BPMeds, prevalentStroke,
-             prevalentHyp, diabetes, totChol, sysBP, diaBP, BMI, heartRate, glucose]
-        ])
-        input_scaled = scaler.transform(input_data)
+        input_scaled = scaler.transform([input_data])
 
-        # Dự đoán nhị phân (0 hoặc 1)
+        # Dự đoán nhị phân và xác suất
         binary_prediction = model.predict(input_scaled)[0]
-        # Dự đoán xác suất (%)
-        probability = model.predict_proba(input_scaled)[0][1] * 100
-        probability = round(probability, 2)
+        probability = round(model.predict_proba(input_scaled)[0][1] * 100, 2)
 
-        return render_template('index.html', binary_prediction=binary_prediction, probability=probability)
+        # Phân tích yếu tố đóng góp
+        contributions = analyze_contributions(input_data)
+
+        recommendations = generate_recommendations(input_data)
+
+        return render_template('index.html',
+                               binary_prediction=binary_prediction,
+                               probability=probability,
+                               contributions=contributions,
+                               recommendations=recommendations)
     except Exception as e:
         return render_template('index.html', error=f"Đã có lỗi xảy ra: {str(e)}")
+
+
+def analyze_contributions(input_data):
+    # Giả sử trọng số từ mô hình
+    weights = model.coef_[0]
+    contributions = {f'Feature {i}': input_data[i] * weights[i] for i in range(len(input_data))}
+    return sorted(contributions.items(), key=lambda x: x[1], reverse=True)[:3]
+
+
+def generate_recommendations(input_data):
+    recommendations = []
+    if input_data[10] > 140:  # sysBP
+        recommendations.append("Giảm muối trong khẩu phần ăn.")
+    if input_data[9] > 240:  # totChol
+        recommendations.append("Giảm ăn chất béo bão hòa.")
+    if input_data[4] > 0:  # cigsPerDay
+        recommendations.append("Cố gắng giảm số lượng thuốc lá.")
+    if input_data[12] > 30:  # BMI
+        recommendations.append("Thực hiện chế độ ăn uống lành mạnh và tập thể dục.")
+
+    return recommendations
 
 
 if __name__ == '__main__':
