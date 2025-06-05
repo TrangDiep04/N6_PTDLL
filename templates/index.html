@@ -4,194 +4,174 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dự Đoán Bệnh Tim Mạch</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
+        .heart-bg {
+            background-image: url('https://www.pngall.com/wp-content/uploads/2016/04/Heart-PNG-Clipart.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
         body {
-            background-color: #f0f4f8;
-            font-family: 'Arial', sans-serif;
-        }
-        .container {
-            max-width: 800px;
-            margin-top: 50px;
-            padding: 20px;
-        }
-        .card {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-        .form-label {
-            font-weight: 600;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-        .alert {
-            text-align: center;
-        }
-        .progress {
-            height: 20px;
-        }
-        .learn-more h3 {
-            color: #343a40;
-        }
-        footer {
-            margin-top: 30px;
-            text-align: center;
-            color: white;
-            background-color: #343a40;
-            padding: 10px;
-            border-radius: 5px;
+            background: linear-gradient(to bottom, #e0f2fe, #bfdbfe);
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="card mt-5">
-            <div class="card-header bg-primary text-white text-center">
-                <h1>Dự Đoán Bệnh Tim Mạch</h1>
+<body class="font-sans antialiased relative">
+    <div class="heart-bg"></div>
+    <div class="container mx-auto max-w-3xl p-6">
+        <div class="bg-white rounded-lg shadow-lg relative">
+            <div class="bg-blue-600 text-white text-center py-4 rounded-t-lg">
+                <h1 class="text-2xl font-bold">Dự Đoán Nguy Cơ Bệnh Tim Mạch</h1>
             </div>
-            <div class="card-body">
-                <form method="POST" action="/predict">
-                    <fieldset>
-                        <legend class="h5">Thông Tin Cá Nhân</legend>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="male" class="form-label" data-bs-toggle="tooltip" title="0 cho Nữ, 1 cho Nam"><i class="bi bi-gender-ambiguous"></i> Giới Tính:</label>
-                                <select class="form-select" id="male" name="male" required>
+            <div class="p-6">
+                <form method="POST" action="/predict" id="heartDiseaseForm">
+                    <fieldset class="mb-6">
+                        <legend class="text-lg font-semibold mb-3">Thông Tin Cá Nhân</legend>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="male" class="block text-sm font-medium text-gray-700"><i class="bi bi-gender-ambiguous"></i> Giới Tính:</label>
+                                <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="male" name="male" required>
                                     <option value="">Chọn Giới Tính</option>
-                                    <option value="0">Nữ</option>
-                                    <option value="1">Nam</option>
+                                    {% set male_value = input_data[0] | int if input_data else -1 %}
+                                    <option value="0" {% if male_value == 0 %}selected{% endif %}>Nữ</option>
+                                    <option value="1" {% if male_value == 1 %}selected{% endif %}>Nam</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="age" class="form-label" data-bs-toggle="tooltip" title="Nhập tuổi của bạn bằng số năm"><i class="bi bi-calendar3"></i> Tuổi:</label>
-                                <input type="number" class="form-control" id="age" name="age" min="1" required>
+                            <div>
+                                <label for="age" class="block text-sm font-medium text-gray-700"><i class="bi bi-calendar3"></i> Tuổi:</label>
+                                <input type="number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="age" name="age" min="1" max="120" step="1" value="{{ input_data[1] if input_data else '' }}" required>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="education" class="form-label" data-bs-toggle="tooltip" title="Trình độ học vấn từ 1 đến 4"><i class="bi bi-mortarboard"></i> Trình Độ Học Vấn (1-4):</label>
-                                <select class="form-select" id="education" name="education" required>
+                            <div>
+                                <label for="education" class="block text-sm font-medium text-gray-700"><i class="bi bi-mortarboard"></i> Trình Độ Học Vấn (1-4):</label>
+                                <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="education" name="education" required>
                                     <option value="">Chọn Trình Độ</option>
-                                    <option value="1">Cấp 1</option>
-                                    <option value="2">Cấp 2</option>
-                                    <option value="3">Cấp 3</option>
-                                    <option value="4">Đại học</option>
+                                    {% set edu_value = input_data[2] | int if input_data else -1 %}
+                                    <option value="1" {% if edu_value == 1 %}selected{% endif %}>Cấp 1</option>
+                                    <option value="2" {% if edu_value == 2 %}selected{% endif %}>Cấp 2</option>
+                                    <option value="3" {% if edu_value == 3 %}selected{% endif %}>Cấp 3</option>
+                                    <option value="4" {% if edu_value == 4 %}selected{% endif %}>Đại học</option>
                                 </select>
                             </div>
                         </div>
                     </fieldset>
-                    <fieldset>
-                        <legend class="h5">Thói Quen Hút Thuốc</legend>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="currentSmoker" class="form-label" data-bs-toggle="tooltip" title="0 cho không hút thuốc, 1 cho hút thuốc"><i class="bi bi-cigarette"></i> Hút Thuốc Hiện Tại:</label>
-                                <select class="form-select" id="currentSmoker" name="currentSmoker" required>
+                    <fieldset class="mb-6">
+                        <legend class="text-lg font-semibold mb-3">Thói Quen Hút Thuốc</legend>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="currentSmoker" class="block text-sm font-medium text-gray-700"><i class="bi bi-cigarette"></i> Hút Thuốc Hiện Tại:</label>
+                                <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="currentSmoker" name="currentSmoker" required>
                                     <option value="">Chọn Trạng Thái</option>
-                                    <option value="0">Không</option>
-                                    <option value="1">Có</option>
+                                    {% set smoker_value = input_data[3] | int if input_data else -1 %}
+                                    <option value="0" {% if smoker_value == 0 %}selected{% endif %}>Không</option>
+                                    <option value="1" {% if smoker_value == 1 %}selected{% endif %}>Có</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="cigsPerDay" class="form-label" data-bs-toggle="tooltip" title="Số điếu thuốc hút mỗi ngày"><i class="bi bi-cigarette-fill"></i> Số Điếu Thuốc Mỗi Ngày:</label>
-                                <input type="number" class="form-control" id="cigsPerDay" name="cigsPerDay" min="0" step="0.1" required>
+                            <div>
+                                <label for="cigsPerDay" class="block text-sm font-medium text-gray-700"><i class="bi bi-cigarette-fill"></i> Số Điếu Thuốc Mỗi Ngày:</label>
+                                <input type="number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="cigsPerDay" name="cigsPerDay" min="0" step="1" value="{{ input_data[4] if input_data else '' }}" required>
                             </div>
                         </div>
                     </fieldset>
-                    <fieldset>
-                        <legend class="h5">Tiền Sử Bệnh</legend>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="BPMeds" class="form-label" data-bs-toggle="tooltip" title="0 cho không sử dụng, 1 cho sử dụng thuốc huyết áp"><i class="bi bi-pills"></i> Thuốc Huyết Áp:</label>
-                                <select class="form-select" id="BPMeds" name="BPMeds" required>
+                    <fieldset class="mb-6">
+                        <legend class="text-lg font-semibold mb-3">Tiền Sử Bệnh</legend>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="BPMeds" class="block text-sm font-medium text-gray-700"><i class="bi bi-pills"></i> Thuốc Huyết Áp:</label>
+                                <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="BPMeds" name="BPMeds" required>
                                     <option value="">Chọn Trạng Thái</option>
-                                    <option value="0">Không</option>
-                                    <option value="1">Có</option>
+                                    {% set bpmeds_value = input_data[5] | int if input_data else -1 %}
+                                    <option value="0" {% if bpmeds_value == 0 %}selected{% endif %}>Không</option>
+                                    <option value="1" {% if bpmeds_value == 1 %}selected{% endif %}>Có</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="prevalentStroke" class="form-label" data-bs-toggle="tooltip" title="0 cho không có đột quỵ, 1 cho đã từng đột quỵ"><i class="bi bi-brain"></i> Đột Quỵ Lịch Sử:</label>
-                                <select class="form-select" id="prevalentStroke" name="prevalentStroke" required>
+                            <div>
+                                <label for="prevalentStroke" class="block text-sm font-medium text-gray-700"><i class="bi bi-brain"></i> Đột Quỵ Lịch Sử:</label>
+                                <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="prevalentStroke" name="prevalentStroke" required>
                                     <option value="">Chọn Trạng Thái</option>
-                                    <option value="0">Không</option>
-                                    <option value="1">Có</option>
+                                    {% set stroke_value = input_data[6] | int if input_data else -1 %}
+                                    <option value="0" {% if stroke_value == 0 %}selected{% endif %}>Không</option>
+                                    <option value="1" {% if stroke_value == 1 %}selected{% endif %}>Có</option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="prevalentHyp" class="form-label" data-bs-toggle="tooltip" title="0 cho không cao huyết áp, 1 cho cao huyết áp"><i class="bi bi-thermometer-high"></i> Cao Huyết Áp:</label>
-                                <select class="form-select" id="prevalentHyp" name="prevalentHyp" required>
+                            <div>
+                                <label for="prevalentHyp" class="block text-sm font-medium text-gray-700"><i class="bi bi-thermometer-high"></i> Cao Huyết Áp:</label>
+                                <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="prevalentHyp" name="prevalentHyp" required>
                                     <option value="">Chọn Trạng Thái</option>
-                                    <option value="0">Không</option>
-                                    <option value="1">Có</option>
+                                    {% set hyp_value = input_data[7] | int if input_data else -1 %}
+                                    <option value="0" {% if hyp_value == 0 %}selected{% endif %}>Không</option>
+                                    <option value="1" {% if hyp_value == 1 %}selected{% endif %}>Có</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="diabetes" class="form-label" data-bs-toggle="tooltip" title="0 cho không tiểu đường, 1 cho tiểu đường"><i class="bi bi-droplet"></i> Tiểu Đường:</label>
-                                <select class="form-select" id="diabetes" name="diabetes" required>
+                            <div>
+                                <label for="diabetes" class="block text-sm font-medium text-gray-700"><i class="bi bi-droplet"></i> Tiểu Đường:</label>
+                                <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="diabetes" name="diabetes" required>
                                     <option value="">Chọn Trạng Thái</option>
-                                    <option value="0">Không</option>
-                                    <option value="1">Có</option>
+                                    {% set diabetes_value = input_data[8] | int if input_data else -1 %}
+                                    <option value="0" {% if diabetes_value == 0 %}selected{% endif %}>Không</option>
+                                    <option value="1" {% if diabetes_value == 1 %}selected{% endif %}>Có</option>
                                 </select>
                             </div>
                         </div>
                     </fieldset>
-                    <fieldset>
-                        <legend class="h5">Các Chỉ Số Sức Khỏe</legend>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="totChol" class="form-label" data-bs-toggle="tooltip" title="Cholesterol toàn phần tính bằng mg/dL"><i class="bi bi-graph-up"></i> Cholesterol Toàn Phần:</label>
-                                <input type="number" class="form-control" id="totChol" name="totChol" min="0" step="0.1" required>
+                    <fieldset class="mb-6">
+                        <legend class="text-lg font-semibold mb-3">Các Chỉ Số Sức Khỏe</legend>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="totChol" class="block text-sm font-medium text-gray-700"><i class="bi bi-graph-up"></i> Cholesterol Toàn Phần (mg/dL):</label>
+                                <input type="number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="totChol" name="totChol" min="0" step="0.1" value="{{ input_data[9] if input_data else '' }}" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="sysBP" class="form-label" data-bs-toggle="tooltip" title="Huyết áp tâm thu tính bằng mmHg"><i class="bi bi-speedometer"></i> Huyết Áp Tâm Thu:</label>
-                                <input type="number" class="form-control" id="sysBP" name="sysBP" min="0" step="0.1" required>
+                            <div>
+                                <label for="sysBP" class="block text-sm font-medium text-gray-700"><i class="bi bi-speedometer"></i> Huyết Áp Tâm Thu (mmHg):</label>
+                                <input type="number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="sysBP" name="sysBP" min="0" step="0.1" value="{{ input_data[10] if input_data else '' }}" required>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="diaBP" class="form-label" data-bs-toggle="tooltip" title="Huyết áp tâm trương tính bằng mmHg"><i class="bi bi-speedometer2"></i> Huyết Áp Tâm Trương:</label>
-                                <input type="number" class="form-control" id="diaBP" name="diaBP" min="0" step="0.1" required>
+                            <div>
+                                <label for="diaBP" class="block text-sm font-medium text-gray-700"><i class="bi bi-speedometer2"></i> Huyết Áp Tâm Trương (mmHg):</label>
+                                <input type="number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="diaBP" name="diaBP" min="0" step="0.1" value="{{ input_data[11] if input_data else '' }}" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="BMI" class="form-label" data-bs-toggle="tooltip" title="Chỉ số BMI tính bằng kg/m²"><i class="bi bi-scale"></i> Chỉ Số BMI:</label>
-                                <input type="number" class="form-control" id="BMI" name="BMI" min="0" step="0.01" required>
+                            <div>
+                                <label for="BMI" class="block text-sm font-medium text-gray-700"><i class="bi bi-scale"></i> Chỉ Số BMI (kg/m²):</label>
+                                <input type="number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="BMI" name="BMI" min="0" step="0.01" value="{{ input_data[12] if input_data else '' }}" required>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="heartRate" class="form-label" data-bs-toggle="tooltip" title="Nhịp tim tính bằng nhịp/phút"><i class="bi bi-heart-pulse"></i> Nhịp Tim:</label>
-                                <input type="number" class="form-control" id="heartRate" name="heartRate" min="0" step="0.1" required>
+                            <div>
+                                <label for="heartRate" class="block text-sm font-medium text-gray-700"><i class="bi bi-heart-pulse"></i> Nhịp Tim (nhịp/phút):</label>
+                                <input type="number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="heartRate" name="heartRate" min="0" step="0.1" value="{{ input_data[13] if input_data else '' }}" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="glucose" class="form-label" data-bs-toggle="tooltip" title="Mức glucose tính bằng mg/dL"><i class="bi bi-droplet-fill"></i> Đường Huyết:</label>
-                                <input type="number" class="form-control" id="glucose" name="glucose" min="0" step="0.1" required>
+                            <div>
+                                <label for="glucose" class="block text-sm font-medium text-gray-700"><i class="bi bi-droplet-fill"></i> Đường Huyết (mg/dL):</label>
+                                <input type="number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="glucose" name="glucose" min="0" step="0.1" value="{{ input_data[14] if input_data else '' }}" required>
                             </div>
                         </div>
                     </fieldset>
-                    <div class="d-flex justify-content-between">
-                        <button type="reset" class="btn btn-secondary">Đặt Lại</button>
-                        <button type="submit" class="btn btn-primary">Dự Đoán</button>
+                    <div class="flex justify-between">
+                        <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition" id="resetButton">Đặt Lại</button>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center" id="predictButton">
+                            <span>Dự Đoán</span>
+                            <svg class="hidden animate-spin ml-2 h-5 w-5 text-white" id="loadingSpinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
         {% if binary_prediction is defined %}
-            <div class="alert alert-{{ 'success' if binary_prediction == 0 else 'danger' }} mt-4 text-center">
-                <h4>{{ 'Nguy Cơ Thấp' if binary_prediction == 0 else 'Nguy Cơ Cao' }}</h4>
+            <div class="mt-6 p-4 bg-white rounded-lg shadow-lg text-center {% if binary_prediction == 0 %}bg-green-50{% else %}bg-red-50{% endif %}">
+                <h4 class="text-lg font-semibold {% if binary_prediction == 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                    {{ 'Nguy Cơ Thấp' if binary_prediction == 0 else 'Nguy Cơ Cao' }}
+                </h4>
                 <p>Dự Đoán Bệnh Tim: {{ binary_prediction }} ({{ 'Không' if binary_prediction == 0 else 'Có' }})</p>
                 <p>Khả Năng Bệnh Tim Trong 10 Năm: {{ probability }}%</p>
-                <div class="progress mt-2">
-                    <div class="progress-bar {% if probability < 30 %}bg-success{% elif probability < 70 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ probability }}%" aria-valuenow="{{ probability }}" aria-valuemin="0" aria-valuemax="100">{{ probability }}%</div>
+                <div class="w-full bg-gray-200 rounded-full h-5 mt-2">
+                    <div class="h-5 rounded-full {% if probability < 30 %}bg-green-500{% elif probability < 70 %}bg-yellow-500{% else %}bg-red-500{% endif %}" style="width: {{ probability }}%"></div>
                 </div>
                 <p class="mt-2">
                     {% if probability < 30 %}
@@ -202,25 +182,44 @@
                         Nguy cơ của bạn cao. Vui lòng tham khảo ý kiến chuyên gia y tế.
                     {% endif %}
                 </p>
+                {% if recommendations %}
+                    <h5 class="text-md font-semibold mt-4">Khuyến Nghị:</h5>
+                    <ul class="list-disc list-inside text-left">
+                        {% for recommendation in recommendations %}
+                            <li>{{ recommendation }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             </div>
         {% endif %}
         {% if error is defined %}
-            <div class="alert alert-danger mt-4 text-center">{{ error }}</div>
+            <div class="mt-6 p-4 bg-red-50 text-red-600 rounded-lg shadow-lg text-center">{{ error }}</div>
         {% endif %}
-
-        <footer>
-            <div>
-                <p>&copy; 2025 Dự Đoán Bệnh Tim Mạch. Tất cả quyền được bảo lưu.</p>
-            </div>
+        <footer class="mt-6 bg-gray-800 text-white text-center py-4 rounded-lg">
+            <p>© 2025 Dự Đoán Bệnh Tim Mạch. Tất cả quyền được bảo lưu.</p>
         </footer>
     </div>
-    <!-- Bootstrap JS and Tooltip Initialization -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
+        document.getElementById('heartDiseaseForm').addEventListener('submit', function(e) {
+            const button = document.getElementById('predictButton');
+            const spinner = document.getElementById('loadingSpinner');
+            button.disabled = true;
+            spinner.classList.remove('hidden');
+            setTimeout(() => {
+                button.disabled = false;
+                spinner.classList.add('hidden');
+            }, 2000);
+        });
+
+        document.getElementById('resetButton').addEventListener('click', function() {
+            const form = document.getElementById('heartDiseaseForm');
+            form.reset(); // Reset form về trạng thái ban đầu
+            // Loại bỏ giá trị selected từ các thẻ select
+            const selects = form.querySelectorAll('select');
+            selects.forEach(select => {
+                select.value = ''; // Đặt về option mặc định
+            });
+        });
     </script>
 </body>
 </html>
