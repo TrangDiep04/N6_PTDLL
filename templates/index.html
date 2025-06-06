@@ -184,11 +184,11 @@
                 </p>
                 {% if recommendations %}
                     <h5 class="text-md font-semibold mt-4">Khuyến Nghị:</h5>
-                    <ul class="list-disc list-inside text-left">
+                   <div class="flex flex-wrap gap-2 justify-center mt-2">
                         {% for recommendation in recommendations %}
-                            <li>{{ recommendation }}</li>
+                            <span class="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full shadow">{{ recommendation }}</span>
                         {% endfor %}
-                    </ul>
+                    </div>
                 {% endif %}
             </div>
         {% endif %}
@@ -210,15 +210,13 @@
                 spinner.classList.add('hidden');
             }, 2000);
         });
-
         document.getElementById('resetButton').addEventListener('click', function() {
             const form = document.getElementById('heartDiseaseForm');
-            form.reset(); // Reset form về trạng thái ban đầu
-            // Loại bỏ giá trị selected từ các thẻ select
-            const selects = form.querySelectorAll('select');
-            selects.forEach(select => {
-                select.value = ''; // Đặt về option mặc định
-            });
+            form.reset();
+            // Clear all input fields
+            form.querySelectorAll('input').forEach(input => input.value = '');
+            // Clear all select fields
+            form.querySelectorAll('select').forEach(select => select.value = '');
         });
     </script>
 </body>
