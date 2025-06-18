@@ -29,11 +29,11 @@ def predict_route():
             float(request.form['heartRate']),
             float(request.form['glucose'])
         ]
-
-        binary_prediction = predict(input_data)
-        probability = round(model.predict_proba(scaler.transform([input_data]))[0][1] * 100, 2)
-        contributions = analyze_contributions(input_data)
-        recommendations = generate_recommendations(input_data)
+        # Thực hiện dự đoán
+        binary_prediction = predict(input_data) # Có nguy cơ mắc không
+        probability = round(model.predict_proba(scaler.transform([input_data]))[0][1] * 100, 2) # Khả năng mắc bệnh bao %
+        contributions = analyze_contributions(input_data) # trường nào ảnh hưởng nhất đến dự đoán
+        recommendations = generate_recommendations(input_data) # đưa ra lời khuyên
 
         return render_template('index.html',
                               binary_prediction=binary_prediction,

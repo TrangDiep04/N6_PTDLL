@@ -8,7 +8,7 @@ import joblib
 import numpy as np
 
 # Đọc dữ liệu đã xử lý
-df = pd.read_csv('../data/framingham_processed.csv')
+df = pd.read_csv('../../data/framingham_processed.csv')
 
 # Chọn đặc trưng đầu vào (X) và biến mục tiêu (y)
 X = df.drop(columns=['TenYearCHD'])
@@ -34,8 +34,8 @@ for i in range(n_runs):
     X_test_scaled = scaler.transform(X_test)
 
     # Huấn luyện mô hình Logistic Regression
-    model = LogisticRegression(max_iter=1000)
-    model.fit(X_train_scaled, y_train)
+    model = LogisticRegression(max_iter=1000) # Khởi tạo mô hình tối đa 1000 lặp
+    model.fit(X_train_scaled, y_train) # Huấn luyện mô hình
 
     # Dự đoán
     y_pred = model.predict(X_test_scaled)
@@ -73,6 +73,6 @@ plt.show()
 
 
 # Lưu mô hình và scaler của lần chạy cuối
-joblib.dump(model, '../data/model.pkl')
-joblib.dump(scaler, '../data/scaler.pkl')
+joblib.dump(model, '../../data/model.pkl')
+joblib.dump(scaler, '../../data/scaler.pkl')
 print("Mô hình và scaler của lần chạy cuối đã được lưu vào 'model.pkl' và 'scaler.pkl'")

@@ -124,7 +124,7 @@ for cot in cot_can_xu_ly_zscore:
 # Vẽ boxplot sau khi xử lý outliers
 draw_boxplots(df, df.columns[:16], 6, 3)
 
-# Lưu dữ liệu đã xử lý vào file CSV mới (dấu phẩy là mặc định)
+# Lưu dữ liệu đã xử lý vào file CSV mới
 df.to_csv('framingham_processed.csv', index=False)
 print("Dữ liệu đã xử lý được lưu vào 'framingham_processed.csv'")
 print(border)
